@@ -13,10 +13,19 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="헤더 파일\predicates">
+      <UniqueIdentifier>{5236a288-3962-452d-9371-d05522bdd71b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tutorial1.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="tutorial2_collision_detection.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\predicates.c">
+      <Filter>헤더 파일\predicates</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -24,6 +33,18 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="src\rigid_body.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\predicates_simple.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\predicates.h">
+      <Filter>헤더 파일\predicates</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry_primer.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

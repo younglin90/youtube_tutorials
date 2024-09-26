@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;Easy3D_VERSION_MAJOR=2;Easy3D_VERSION_MINOR=5;Easy3D_VERSION_PATCH=3;Easy3D_VERSION_STRING="2.5.3";Easy3D_VERSION_NUMBER=1020503;ELPP_FEATURE_ALL;ELPP_STL_LOGGING;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;ELPP_DISABLE_DEFAULT_CRASH_HANDLING;Easy3D_RESOURCE_DIR="D:/work/Easy3D/resources";ELPP_AS_DLL;GLEW_NO_GLU;CMAKE_INTDIR="Debug";/bigobj</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;Easy3D_VERSION_MAJOR=2;Easy3D_VERSION_MINOR=5;Easy3D_VERSION_PATCH=3;Easy3D_VERSION_STRING="2.5.3";Easy3D_VERSION_NUMBER=1020503;ELPP_FEATURE_ALL;ELPP_STL_LOGGING;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;ELPP_DISABLE_DEFAULT_CRASH_HANDLING;Easy3D_RESOURCE_DIR="D:/work/Easy3D/resources";ELPP_AS_DLL;GLEW_NO_GLU;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>D:\work\Easy3D;D:\work\Easy3D\build\include;D:\work\eigen-3.4.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -132,10 +132,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="tutorial1.cpp" />
+    <ClCompile Include="src\predicates.c" />
+    <ClCompile Include="tutorial1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tutorial2_collision_detection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\constraints.hpp" />
+    <ClInclude Include="src\geometry_primer.hpp" />
+    <ClInclude Include="src\predicates.h" />
+    <ClInclude Include="src\predicates_simple.hpp" />
+    <ClInclude Include="src\renderer.hpp" />
     <ClInclude Include="src\rigid_body.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
