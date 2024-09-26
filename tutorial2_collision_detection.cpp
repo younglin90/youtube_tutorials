@@ -17,8 +17,7 @@ int main() {
 
     GeometryPrimer primer;
 
-
-    //exactinit();
+    exactinit();
     double p1[3] = { 0, 0, 0 };
     double p2[3] = { 1, 1e-8, 1e-8 };
     double p3[3] = { 2, 2e-8, 2e-8 };
