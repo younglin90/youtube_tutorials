@@ -18,6 +18,34 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main_benchmark.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tutorial2\src\predicates.c" />
+    <ClCompile Include="tutorial2\tutorial2_collision_detection.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tutorial2\src\constraints.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\closest.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\geometry.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\gjk.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\inside.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\overlap.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\shapes.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\shapes_External_Polymorphism.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\shapes_test.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\shapes_visitor.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\shape_model.hpp" />
+    <ClInclude Include="tutorial2\src\geometry\shape_model_generator.hpp" />
+    <ClInclude Include="tutorial2\src\geometry_primer.hpp" />
+    <ClInclude Include="tutorial2\src\predicates.h" />
+    <ClInclude Include="tutorial2\src\predicates_simple.hpp" />
+    <ClInclude Include="tutorial2\src\renderer.hpp" />
+    <ClInclude Include="tutorial2\src\rigid_body.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -102,18 +130,19 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;Easy3D_VERSION_MAJOR=2;Easy3D_VERSION_MINOR=5;Easy3D_VERSION_PATCH=3;Easy3D_VERSION_STRING="2.5.3";Easy3D_VERSION_NUMBER=1020503;ELPP_FEATURE_ALL;ELPP_STL_LOGGING;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;ELPP_DISABLE_DEFAULT_CRASH_HANDLING;Easy3D_RESOURCE_DIR="D:/work/Easy3D/resources";ELPP_AS_DLL;GLEW_NO_GLU;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;Easy3D_VERSION_MAJOR=2;Easy3D_VERSION_MINOR=5;Easy3D_VERSION_PATCH=3;Easy3D_VERSION_STRING="2.5.3";Easy3D_VERSION_NUMBER=1020503;ELPP_FEATURE_ALL;ELPP_STL_LOGGING;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;ELPP_DISABLE_DEFAULT_CRASH_HANDLING;Easy3D_RESOURCE_DIR="D:/work/Easy3D/resources";ELPP_AS_DLL;GLEW_NO_GLU;CMAKE_INTDIR="Debug";HAVE_STD_REGEX;HAVE_STEADY_CLOCK;TEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS;BENCHMARK_STATIC_DEFINE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\work\eigen-3.4.0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\work\eigen-3.4.0;D:\work\Easy3D;D:\work\Easy3D\build\include;D:\work\benchmark\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <UndefinePreprocessorDefinitions>NDEBUG</UndefinePreprocessorDefinitions>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\work\Easy3D\build;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>lib\Debug\easy3d_viewer.lib;lib\Debug\easy3d_renderer.lib;lib\Debug\easy3d_algo.lib;lib\Debug\easy3d_kdtree.lib;opengl32.lib;lib\Debug\easy3d_fileio.lib;lib\Debug\easy3d_core.lib;lib\Debug\easy3d_util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\work\benchmark\build\src\Debug\benchmark.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,21 +164,6 @@
       <AdditionalDependencies />
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\predicates.c" />
-    <ClCompile Include="tutorial1.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="tutorial2_collision_detection.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\constraints.hpp" />
-    <ClInclude Include="src\geometry_primer.hpp" />
-    <ClInclude Include="src\predicates.h" />
-    <ClInclude Include="src\predicates_simple.hpp" />
-    <ClInclude Include="src\renderer.hpp" />
-    <ClInclude Include="src\rigid_body.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

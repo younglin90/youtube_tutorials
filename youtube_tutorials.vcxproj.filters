@@ -13,39 +13,72 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="헤더 파일\predicates">
-      <UniqueIdentifier>{5236a288-3962-452d-9371-d05522bdd71b}</UniqueIdentifier>
+    <Filter Include="헤더 파일\geometry">
+      <UniqueIdentifier>{f17b52dd-361c-4b66-8c38-1fe8f5df59c2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tutorial1.cpp">
+    <ClCompile Include="tutorial2\tutorial2_collision_detection.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="tutorial2_collision_detection.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="tutorial2\src\predicates.c">
+      <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="src\predicates.c">
-      <Filter>헤더 파일\predicates</Filter>
+    <ClCompile Include="main_benchmark.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\constraints.hpp">
+    <ClInclude Include="tutorial2\src\constraints.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="src\rigid_body.hpp">
+    <ClInclude Include="tutorial2\src\geometry_primer.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer.hpp">
+    <ClInclude Include="tutorial2\src\predicates.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="src\predicates_simple.hpp">
+    <ClInclude Include="tutorial2\src\predicates_simple.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="src\predicates.h">
-      <Filter>헤더 파일\predicates</Filter>
-    </ClInclude>
-    <ClInclude Include="src\geometry_primer.hpp">
+    <ClInclude Include="tutorial2\src\renderer.hpp">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\rigid_body.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\shapes.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\closest.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\inside.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\overlap.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\geometry.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\gjk.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\shape_model_generator.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\shape_model.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\shapes_External_Polymorphism.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\shapes_test.hpp">
+      <Filter>헤더 파일\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial2\src\geometry\shapes_visitor.hpp">
+      <Filter>헤더 파일\geometry</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
