@@ -28,6 +28,8 @@ namespace SimulMan {
         easy3d::PointsDrawable* pointsDrawer{};
         easy3d::LinesDrawable* linesDrawer{};
         easy3d::TrianglesDrawable* surfaceDrawer{};
+        easy3d::PointsDrawable* closestDrawer{};
+        easy3d::LinesDrawable* raysDrawer{};
         std::vector<unsigned int>* pos_sizes{};
         std::vector<unsigned int>* pos_str{};
         int selected_model_id = 0;
@@ -35,14 +37,36 @@ namespace SimulMan {
 
         bool on_insider = false;
         bool on_overlap = false;
+        bool on_closest = false;
+        bool on_raycast = false;
+        bool on_two_planes = false;
+        bool on_three_planes = false;
 
         SimulMan::Shape shape0;
         SimulMan::Shape shape1;
+        SimulMan::Shape shape2;
 
         bool shape0_is_line = false;
         bool shape0_is_surface = false;
 
     protected:
+
+        bool on_highlight() {
+            surfaceDrawer->set_highlight_range(std::make_pair(0, 1000));
+            linesDrawer->set_highlight_range(std::make_pair(0, 1000));
+            pointsDrawer->set_highlight_range(std::make_pair(0, 1000));
+
+            surfaceDrawer->set_highlight(true);
+            linesDrawer->set_highlight(true);
+            pointsDrawer->set_highlight(true);
+            return true;
+        }
+        bool off_highlight() {
+            surfaceDrawer->set_highlight(false);
+            linesDrawer->set_highlight(false);
+            pointsDrawer->set_highlight(false);
+            return true;
+        }
 
         bool key_press_event(int key, int modifiers) override {
             if (true) {
@@ -103,8 +127,6 @@ namespace SimulMan {
                 //pointsDrawer->set_color(easy3d::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
 
-                update();
-
                 if (auto pval = std::get_if<SimulMan::AABB>(&shape0)) {
                     pval->min += translation;
                     pval->max += translation;
@@ -127,6 +149,12 @@ namespace SimulMan {
                     pval->b += translation;
                     pval->c += translation;
                 }
+                if (auto pval = std::get_if<SimulMan::Tetrahedra>(&shape0)) {
+                    pval->a += translation;
+                    pval->b += translation;
+                    pval->c += translation;
+                    pval->d += translation;
+                }
                 if (auto pval = std::get_if<SimulMan::ConvexPolyhedra>(&shape0)) {
                     for (auto& p : (*pval)) {
                         p += translation;
@@ -134,42 +162,103 @@ namespace SimulMan {
                 }
 
                 if (on_insider) {
-
-                    if (is_inside(shape1, shape0)) {
-                        surfaceDrawer->set_highlight_range(std::make_pair(0, 1000));
-                        linesDrawer->set_highlight_range(std::make_pair(0, 1000));
-                        pointsDrawer->set_highlight_range(std::make_pair(0, 1000));
-
-                        surfaceDrawer->set_highlight(true);
-                        linesDrawer->set_highlight(true);
-                        pointsDrawer->set_highlight(true);
-
-                    }
-                    else {
-                        surfaceDrawer->set_highlight(false);
-                        linesDrawer->set_highlight(false);
-                        pointsDrawer->set_highlight(false);
-                    }
+                    if (is_inside(shape1, shape0)) on_highlight();
+                    else off_highlight();
                 }
 
                 if (on_overlap) {
+                    if (is_overlap(shape1, shape0)) on_highlight();
+                    else off_highlight();
+                }
 
-                    if (is_overlap(shape1, shape0)) {
-                        surfaceDrawer->set_highlight_range(std::make_pair(0, 1000));
-                        linesDrawer->set_highlight_range(std::make_pair(0, 1000));
-                        pointsDrawer->set_highlight_range(std::make_pair(0, 1000));
+                if (on_closest) {
+                    auto p = closest(shape1, shape0);
 
-                        surfaceDrawer->set_highlight(true);
-                        linesDrawer->set_highlight(true);
-                        pointsDrawer->set_highlight(true);
+                    closestDrawer->set_highlight_range(std::make_pair(0, 1000));
+                    closestDrawer->set_highlight(true);
+
+                    void* pointer = easy3d::VertexArrayObject::map_buffer(GL_ARRAY_BUFFER, closestDrawer->vertex_buffer(), GL_WRITE_ONLY);
+                    easy3d::vec3* vertices = reinterpret_cast<easy3d::vec3*>(pointer);
+                    if (!vertices) return false;
+                    vertices[0][0] = p[0];
+                    vertices[0][1] = p[1];
+                    vertices[0][2] = p[2];
+                    easy3d::VertexArrayObject::unmap_buffer(GL_ARRAY_BUFFER, closestDrawer->vertex_buffer());
+
+                }
+
+                if (on_raycast) {
+                    auto [is_collide, t] = raycast(shape1, shape0);
+
+                    if (is_collide) {
+                        closestDrawer->set_highlight_range(std::make_pair(0, 1000));
+                        closestDrawer->set_highlight(true);
+
+                        void* pointer = easy3d::VertexArrayObject::map_buffer(GL_ARRAY_BUFFER, closestDrawer->vertex_buffer(), GL_WRITE_ONLY);
+                        easy3d::vec3* vertices = reinterpret_cast<easy3d::vec3*>(pointer);
+                        if (!vertices) return false;
+
+                        auto& ray = *std::get_if<SimulMan::Ray>(&shape1);
+                        vertices[0][0] = ray.p[0] + t * ray.n[0];
+                        vertices[0][1] = ray.p[1] + t * ray.n[1];
+                        vertices[0][2] = ray.p[2] + t * ray.n[2];
+                        easy3d::VertexArrayObject::unmap_buffer(GL_ARRAY_BUFFER, closestDrawer->vertex_buffer());
 
                     }
                     else {
-                        surfaceDrawer->set_highlight(false);
-                        linesDrawer->set_highlight(false);
-                        pointsDrawer->set_highlight(false);
+                        closestDrawer->set_highlight(false);
                     }
+
                 }
+
+                if (on_two_planes) {
+                    auto [is_collide, ray] = intersect_two_planes(shape1, shape0);
+
+                    if (is_collide) {
+                        raysDrawer->set_highlight_range(std::make_pair(0, 1000));
+                        raysDrawer->set_highlight(true);
+                        raysDrawer->set_color(easy3d::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+                        void* pointer = easy3d::VertexArrayObject::map_buffer(GL_ARRAY_BUFFER, raysDrawer->vertex_buffer(), GL_WRITE_ONLY);
+                        easy3d::vec3* vertices = reinterpret_cast<easy3d::vec3*>(pointer);
+                        if (!vertices) return false;
+
+                        vertices[0][0] = ray.p[0] - 5.0 * ray.n[0]; vertices[0][1] = ray.p[1] - 5.0 * ray.n[1]; vertices[0][2] = ray.p[2] - 5.0 * ray.n[2];
+                        vertices[1][0] = ray.p[0] + 5.0 * ray.n[0]; vertices[1][1] = ray.p[1] + 5.0 * ray.n[1]; vertices[1][2] = ray.p[2] + 5.0 * ray.n[2];
+                        easy3d::VertexArrayObject::unmap_buffer(GL_ARRAY_BUFFER, raysDrawer->vertex_buffer());
+
+                    }
+                    else {
+                        raysDrawer->set_highlight(false);
+                    }
+
+                }
+
+
+                if (on_three_planes) {
+                    auto [is_collide, p] = intersect_three_planes(shape0, shape1, shape2);
+
+                    if (is_collide) {
+                        closestDrawer->set_highlight_range(std::make_pair(0, 1000));
+                        closestDrawer->set_highlight(true);
+
+                        void* pointer = easy3d::VertexArrayObject::map_buffer(GL_ARRAY_BUFFER, closestDrawer->vertex_buffer(), GL_WRITE_ONLY);
+                        easy3d::vec3* vertices = reinterpret_cast<easy3d::vec3*>(pointer);
+                        if (!vertices) return false;
+
+                        vertices[0][0] = p[0];
+                        vertices[0][1] = p[1];
+                        vertices[0][2] = p[2];
+                        easy3d::VertexArrayObject::unmap_buffer(GL_ARRAY_BUFFER, closestDrawer->vertex_buffer());
+
+                    }
+                    else {
+                        closestDrawer->set_highlight(false);
+                    }
+
+                }
+
+                update();
 
                 return true;
             }
@@ -179,13 +268,21 @@ namespace SimulMan {
     };
 
 
+    //class Renderer;
+
+    //template<typename T>
+    //concept ThreePlanesTester = std::same_as<T, Renderer::Tester> && (T::ThreePlanes == Renderer::Tester::ThreePlanes);
+
+
     class Renderer {
     public:
         //using Shapes = std::vector<std::shared_ptr<SimulMan::Shape>>;
         using Shapes = std::vector<SimulMan::Shape>;
         MyViewer viewer{};
         easy3d::PointsDrawable* pointsDrawer{};
+        easy3d::PointsDrawable* closestDrawer{};
         easy3d::LinesDrawable* linesDrawer{};
+        easy3d::LinesDrawable* raysDrawer{};
         easy3d::TrianglesDrawable* surfaceDrawer{};
         std::vector<unsigned int> pos_sizes{};
         std::vector<unsigned int> pos_str{};
@@ -197,7 +294,12 @@ namespace SimulMan {
         enum class Tester {
             Inside,
             Overlap,
+            Closest,
+            Raycast,
+            TwoPlanes,
+            ThreePlanes,
         };
+
 
         explicit Renderer(Shapes& shapes) :
             shapes_(shapes)
@@ -205,15 +307,6 @@ namespace SimulMan {
             init();
         }
 
-        explicit Renderer(Shapes& shapes, bool on_insider) :
-            shapes_(shapes)
-        {
-            viewer.on_insider = on_insider;
-            viewer.shape0 = shapes[0];
-            viewer.shape1 = shapes[1];
-
-            init();
-        }
 
         explicit Renderer(const Shape& shape0, const Shape& shape1, Tester tester)
         {
@@ -236,8 +329,17 @@ namespace SimulMan {
             if (tester == Tester::Inside) {
                 viewer.on_insider = true;
             }
-            if (tester == Tester::Overlap) {
+            else if (tester == Tester::Overlap) {
                 viewer.on_overlap = true;
+            }
+            else if (tester == Tester::Closest) {
+                viewer.on_closest = true;
+            }
+            else if (tester == Tester::Raycast) {
+                viewer.on_raycast = true;
+            }
+            else if (tester == Tester::TwoPlanes) {
+                viewer.on_two_planes = true;
             }
             viewer.shape0 = shape0;
             viewer.shape1 = shape1;
@@ -250,6 +352,8 @@ namespace SimulMan {
             this->pointsDrawer = new easy3d::PointsDrawable("points");
             this->linesDrawer = new easy3d::LinesDrawable("line");
             this->surfaceDrawer = new easy3d::TrianglesDrawable("faces");
+            this->closestDrawer = new easy3d::PointsDrawable("closest");
+            this->raysDrawer = new easy3d::LinesDrawable("ray");
 
             init_easy3d_udf();
 
@@ -259,11 +363,36 @@ namespace SimulMan {
             viewer.pointsDrawer = pointsDrawer;
             viewer.linesDrawer = linesDrawer;
             viewer.surfaceDrawer = surfaceDrawer;
+            viewer.closestDrawer = closestDrawer;
+            viewer.raysDrawer = raysDrawer;
 
             viewer.selected_model_id = 0;
             viewer.selected_model_ = &shapes_[viewer.selected_model_id];
 
             //set_animation();
+        }
+
+
+
+        explicit Renderer(const Shape& shape0, const Shape& shape1, const Shape& shape2, const Tester& tester)
+        {
+            assert(tester == Tester::ThreePlanes);
+
+            shapes_.push_back(shape0);
+            shapes_.push_back(shape1);
+            shapes_.push_back(shape2);
+
+            viewer.shape0_is_line = false;
+            viewer.shape0_is_surface = true;
+
+            viewer.shape0 = shape0;
+            viewer.shape1 = shape1;
+            viewer.shape2 = shape2;
+
+            viewer.on_three_planes = true;
+
+            init();
+
         }
 
         int run() {
@@ -368,7 +497,8 @@ namespace SimulMan {
             if (real_points.size() != 0) {
                 pointsDrawer->update_vertex_buffer(real_points);
                 pointsDrawer->set_uniform_coloring(easy3d::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-                pointsDrawer->set_point_size(real_point_size);
+                pointsDrawer->set_point_size(18.0f);
+                pointsDrawer->set_impostor_type(easy3d::PointsDrawable::SPHERE);
                 viewer.add_drawable(pointsDrawer);
             }
 
@@ -417,6 +547,27 @@ namespace SimulMan {
                 viewer.add_drawable(surfaceDrawer);
             }
 
+
+
+
+            // closest 포인트 그리기
+            if(viewer.on_closest || viewer.on_raycast || viewer.on_three_planes) {
+                std::vector<easy3d::vec3> closest_point = { {0,0,0} };
+                closestDrawer->update_vertex_buffer(closest_point);
+                closestDrawer->set_uniform_coloring(easy3d::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+                closestDrawer->set_point_size(25.0f);
+                closestDrawer->set_impostor_type(easy3d::PointsDrawable::SPHERE);
+                viewer.add_drawable(closestDrawer);
+            }
+
+            // ray 그리기
+            if(viewer.on_two_planes) {
+                std::vector<easy3d::vec3> ray_points = { {0,0,0}, {0,0,0} };
+                raysDrawer->update_vertex_buffer(ray_points);
+                raysDrawer->set_uniform_coloring(easy3d::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+                raysDrawer->set_line_width(line_point_size);
+                viewer.add_drawable(raysDrawer);
+            }
 
 
             //viewer.fit_screen();

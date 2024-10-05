@@ -102,10 +102,6 @@ namespace SimulMan {
 
     };
     struct Tetrahedra {
-
-        Tetrahedra() = default;
-
-
         vec3 a{}, b{}, c{}, d{};
 
     };
@@ -114,7 +110,7 @@ namespace SimulMan {
 
 
     using Shape = std::variant<Point, Triangle, Square,
-        Plane, Ray, Segment, Sphere, AABB, ConvexPolyhedra>;
+        Plane, Ray, Segment, Sphere, AABB, ConvexPolyhedra, Tetrahedra>;
 
 
 
@@ -307,6 +303,99 @@ namespace SimulMan {
     }
 
 
+    // 레이케스트
+    class ShapeRaycastVisitor
+    {
+    public:
+        template<typename T, typename U>
+        std::pair<bool, double> operator()(T const& shape1, U const& shape2) const {
+            if constexpr (
+                (std::is_same_v<T, Ray> && std::is_same_v<U, Triangle>) ||
+                (std::is_same_v<T, Triangle> && std::is_same_v<U, Ray>)
+            ) {
+                return raycast(shape1, shape2);
+            }
+            else if constexpr (
+                (std::is_same_v<T, Ray> && std::is_same_v<U, Plane>) ||
+                (std::is_same_v<T, Plane> && std::is_same_v<U, Ray>)
+            ) {
+                return raycast(shape1, shape2);
+            }
+            else if constexpr (
+                (std::is_same_v<T, Ray> && std::is_same_v<U, AABB>) ||
+                (std::is_same_v<T, AABB> && std::is_same_v<U, Ray>)
+            ) {
+                return raycast(shape1, shape2);
+            }
+            else if constexpr (
+                (std::is_same_v<T, Ray> && std::is_same_v<U, Sphere>) ||
+                (std::is_same_v<T, Sphere> && std::is_same_v<U, Ray>)
+            ) {
+                return raycast(shape1, shape2);
+            }
+
+            else {
+                return std::make_pair(false, -1);
+            }
+
+        }
+    };
+
+    std::pair<bool, double> raycast(const Shape& shape1, const Shape& shape2)
+    {
+        return std::visit(ShapeRaycastVisitor{}, shape1, shape2);
+    }
+
+
+    // 2 평면
+    class ShapeTwoPlanesVisitor
+    {
+    public:
+        template<typename T, typename U>
+        std::pair<bool, Ray> operator()(T const& shape1, U const& shape2) const {
+            if constexpr (
+                (std::is_same_v<T, Plane> && std::is_same_v<U, Plane>) 
+            ) {
+                return intersect_two_planes(shape1, shape2);
+            }
+
+            else {
+                return std::make_pair(false, Ray{});
+            }
+
+        }
+    };
+    std::pair<bool, Ray> intersect_two_planes(const Shape& shape1, const Shape& shape2)
+    {
+        return std::visit(ShapeTwoPlanesVisitor{}, shape1, shape2);
+    }
+
+
+    // 3 평면
+    class ShapeTreePlanesVisitor
+    {
+    public:
+        template<typename T, typename U, typename P>
+        std::pair<bool, vec3> operator()(T const& shape1, U const& shape2, P const& shape3) const {
+            if constexpr (
+                (std::is_same_v<T, Plane> && std::is_same_v<U, Plane> && std::is_same_v<P, Plane>)
+                ) {
+                return intersect_three_planes(shape1, shape2, shape3);
+            }
+
+            else {
+                return std::make_pair(false, vec3{});
+            }
+
+        }
+    };
+    std::pair<bool, vec3> intersect_three_planes(const Shape& shape1, const Shape& shape2, const Shape& shape3)
+    {
+        return std::visit(ShapeTreePlanesVisitor{}, shape1, shape2, shape3);
+    }
+
+
+
 
 
 
@@ -352,39 +441,6 @@ namespace SimulMan {
 
     }
 
-
-
-
-    class ShapeRaycastVisitor
-    {
-    public:
-        template<typename T, typename U>
-        std::pair<bool, double> operator()(T const& shape1, U const& shape2) const {
-            //if constexpr (std::is_same_v<T, Ray> && std::is_same_v<U, Ray>) {
-            //    return raycast(shape1, shape2);
-            //}
-            if constexpr (std::is_same_v<T, Sphere> && std::is_same_v<U, Ray>) {
-                return raycast(shape1, shape2);
-            }
-            else if constexpr (std::is_same_v<T, AABB> && std::is_same_v<U, Ray>) {
-                return raycast(shape1, shape2);
-            }
-            else if constexpr (std::is_same_v<T, Plane> && std::is_same_v<U, Ray>) {
-                return raycast(shape1, shape2);
-            }
-            else if constexpr (std::is_same_v<T, Triangle> && std::is_same_v<U, Ray>) {
-                return raycast(shape1, shape2);
-            }
-            else {
-                return std::make_pair(false, -1);
-            }
-        }
-    };
-
-    std::pair<bool, double> raycast(const Shape& shape1, const Shape& shape2)
-    {
-        return std::visit(ShapeRaycastVisitor{}, shape1, shape2);
-    }
 
 
 
@@ -640,6 +696,21 @@ namespace SimulMan {
 
                 return std::make_tuple(real_pos, line_pos, pos, f2v);
             }
+            else if constexpr (std::is_same_v<T, Tetrahedra>) {
+
+                std::vector<vec3> real_pos;
+                std::vector<vec3> line_pos;
+
+                std::vector<vec3> pos = { s.a, s.b, s.c, s.d };
+                index2_t f2v = {
+                    {0,1,2},
+                    {0,2,3},
+                    {0,3,1},
+                    {1,3,2}
+                };
+
+                return std::make_tuple(real_pos, line_pos, pos, f2v);
+                }
             else {
                 std::vector<vec3> pos;
                 index2_t f2v;

@@ -22,71 +22,79 @@ namespace SimulMan {
     using vec3 = Eigen::Vector3d;
     using vec4 = Eigen::Vector4d;
 
+    using Point = vec3;
+
     //✓ 점 in 구
-    bool is_inside(const vec3& p, const Sphere& s) {
+    bool is_inside(const Point& p, const Sphere& s) {
         return (p - s.c).squaredNorm() < s.r * s.r;
     }
-    bool is_inside(const Sphere& s, const vec3& p) {
+    bool is_inside(const Sphere& s, const Point& p) {
         return is_inside(p, s);
     }
     // 점 in AABB
-    bool is_inside(const vec3& p, const AABB& aabb) {
+    bool is_inside(const Point& p, const AABB& aabb) {
         if (p[0] < aabb.min[0] || p[1] < aabb.min[1] || p[2] < aabb.min[2]) return false;
         if (p[0] > aabb.max[0] || p[1] > aabb.max[1] || p[2] > aabb.max[2]) return false;
         return true;
     }
-    bool is_inside(const AABB& aabb, const vec3& p) {
+    bool is_inside(const AABB& aabb, const Point& p) {
         return is_inside(p, aabb);
     }
     //✓ 점 in 평면       GPC pp171
-    bool is_inside(const vec3& p, const Plane& plane) {
+    bool is_inside(const Point& p, const Plane& plane) {
         double dot = p.dot(plane.n);
         return std::abs(dot - plane.d) <= 1.e-12;
     }
-    bool is_inside(const Plane& plane, const vec3& p) {
+    bool is_inside(const Plane& plane, const Point& p) {
         return is_inside(p, plane);
     }
     //✓ 점 in 세그먼트           GPC pp172
-    vec3 closest(const vec3& p, const Segment& seg);
-    bool is_inside(const vec3& p, const Segment& seg) {
+    vec3 closest(const Point& p, const Segment& seg);
+    bool is_inside(const Point& p, const Segment& seg) {
         vec3 cloPt = closest(p, seg);
         return std::abs((p - cloPt).squaredNorm()) <= 1.e-12;
     }
-    bool is_inside(const Segment& seg, const vec3& p) {
+    bool is_inside(const Segment& seg, const Point& p) {
         return is_inside(p, seg);
     }
     // 점 in 레이           GPC pp174
-    bool is_inside(const vec3& p, const Ray& ray) {
+    bool is_inside(const Point& p, const Ray& ray) {
         vec3 norm = p - ray.p;
         if (norm.squaredNorm() < 1.e-12) return true;
         norm.normalize();
         double diff = norm.dot(ray.n);
         return std::abs(diff - 1.0) < 1.e-12;
     }
-    bool is_inside(const Ray& ray, const vec3& p) {
+    bool is_inside(const Ray& ray, const Point& p) {
         return is_inside(p, ray);
     }
     // 점 in 삼각형           GPC pp224, RTCD 203
     bool is_inside(
-        const vec3& p,
+        const Point& p,
         const Triangle& t
     ) {
+        // 우선 점이 삼각형 평면 위에 있는지 확인
+        Plane plane;
+        plane.n = (t.b - t.a).cross(t.c - t.a).normalized();
+        plane.d = plane.n.dot(t.a);
+        if (is_inside(p, plane) == false) return false;
+
         vec3 pa = t.a - p;
         vec3 pb = t.b - p;
         vec3 pc = t.c - p;
 
-        vec3 normPBC = pb.cross(pc);
-        vec3 normPCA = pc.cross(pa);
-        vec3 normPAB = pa.cross(pb);
-
-        if (normPBC.dot(normPCA) < 0.0) {
-            return false;
-        }
-        else if (normPBC.dot(normPAB) < 0.0) {
-            return false;
-        }
+        vec3 u = pb.cross(pc);
+        vec3 v = pc.cross(pa);
+        if (u.dot(v) < 0.0) return false;
+        vec3 w = pa.cross(pb);
+        if (u.dot(w) < 0.0) return false;
         return true;
-
+    }
+    bool is_inside(
+        const Triangle& t,
+        const Point& p
+    ) {
+        return is_inside(p, t);
     }
     //★ 점 in 다각형           RTCD 201
     // 요르단 곡선 정리 사용.
@@ -119,7 +127,7 @@ namespace SimulMan {
     // 점 in 다면체           RTCD 206
     // 점이 각 반공간 내부에 있다면 다면체 내부에 있는 것
     bool is_inside(
-        const vec3& p,
+        const Point& p,
         const std::vector<Plane>& planes
     ) {
         for (auto& plane : planes) {

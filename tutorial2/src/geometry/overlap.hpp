@@ -57,18 +57,26 @@ namespace SimulMan {
         if (std::abs(plane1.n.dot(plane2.n)) < 1.e-12)
             return std::make_pair(false, vec3(0.0, 0.0, 0.0));
 
-        // 평면위에 임의의 점
-        vec3 p0 = -plane0.d * plane0.n;
-        vec3 p1 = -plane1.d * plane1.n;
-        vec3 p2 = -plane2.d * plane2.n;
+        vec3 u = plane1.n.cross(plane2.n);
+        double denom = plane0.n.dot(u);
+        if (std::abs(denom) < 1.e-12) return std::make_pair(false, vec3(0.0, 0.0, 0.0));
 
-        vec3 result;
-        result =
-            p0.dot(plane0.n) * plane1.n.cross(plane2.n) +
-            p1.dot(plane1.n) * plane2.n.cross(plane0.n) +
-            p2.dot(plane2.n) * plane0.n.cross(plane1.n);
-        result /= plane0.n.dot(plane1.n.cross(plane2.n));
+        vec3 result = (plane0.d * u +
+            plane0.n.cross(plane2.d * plane1.n - plane1.d * plane2.n)) / denom;
         return std::make_pair(true, result);
+
+        //// 평면위에 임의의 점
+        //vec3 p0 = -plane0.d * plane0.n;
+        //vec3 p1 = -plane1.d * plane1.n;
+        //vec3 p2 = -plane2.d * plane2.n;
+
+        //vec3 result;
+        //result =
+        //    p0.dot(plane0.n) * plane1.n.cross(plane2.n) +
+        //    p1.dot(plane1.n) * plane2.n.cross(plane0.n) +
+        //    p2.dot(plane2.n) * plane0.n.cross(plane1.n);
+        //result /= plane0.n.dot(plane1.n.cross(plane2.n));
+        //return std::make_pair(true, result);
     }
     //==========================================
 
@@ -134,7 +142,7 @@ namespace SimulMan {
         const Sphere& s,
         const Triangle& tri
     ) {
-        vec3 clo_point = closest(s.c, { tri.a, tri.b, tri.c });
+        vec3 clo_point = closest(s.c, Triangle{ tri.a, tri.b, tri.c });
         double magSq = (clo_point - s.c).squaredNorm();
         return magSq <= s.r * s.r;
     }

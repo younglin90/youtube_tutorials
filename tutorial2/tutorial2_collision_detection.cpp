@@ -29,30 +29,118 @@
 
 int main() {
 
-	//shapes.push_back(SimulMan::Plane{ { 0, 0, 0 } , 1.0 });
-	//shapes.push_back(SimulMan::vec3{ 0, 0, 0 });
 
+	//======== 인사이드
+	//점 aabb
 	//SimulMan::Renderer renderer(
 	//	SimulMan::AABB{ { -0.5, -0.5, -0.5 } , { 0.5, 0.5, 0.5 } },
 	//	SimulMan::vec3{ 0, 0, 0 },
-	//	true);
+	//	SimulMan::Renderer::Tester::Inside);
+	//점 삼각형
 	//SimulMan::Renderer renderer(
-	//	SimulMan::Sphere{ { -0.8, -0.8, -0.8 } , 0.6 },
+	//	SimulMan::Triangle{ { 0, 0, 0 } , { 1, 1, 0 }, { 0, 0, 1 } },
 	//	SimulMan::vec3{ 0, 0, 0 },
-	//	true);
+	//	SimulMan::Renderer::Tester::Inside);
+	//점 구
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Sphere{ { -0.3, -0.3, -0.3 } , 0.6 },
+	//	SimulMan::vec3{ 0, 0, 0 },
+	//	SimulMan::Renderer::Tester::Inside);
+	//점 광선
 	//SimulMan::Renderer renderer(
 	//	SimulMan::Ray{ { -0.5, -0.5, -0.5 } , { 1.0, 0.0, 0.0 } },
 	//	SimulMan::vec3{ 0, 0, 0 },
-	//	true);
+	//	SimulMan::Renderer::Tester::Inside);
+	//점 선분
 	//SimulMan::Renderer renderer(
 	//	SimulMan::Segment{ { 0, 0, 0 } , { 1.0, 0.0, 0.0 } },
 	//	SimulMan::vec3{ 0, 0, 0 },
-	//	true);
+	//	SimulMan::Renderer::Tester::Inside);
+	//점 평면
 	//SimulMan::Renderer renderer(
 	//	SimulMan::Plane{ { 1, 1, 1 } , 1.0 },
 	//	SimulMan::vec3{ 0, 0, 0 },
-	//	true);
+	//	SimulMan::Renderer::Tester::Inside);
 
+
+	//======== closest
+	//점 구
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Sphere{ { -0.8, -0.8, -0.8 } , 0.6 },
+	//	SimulMan::Point{ 0, 0, 0 },
+	//	SimulMan::Renderer::Tester::Closest);
+	//점 aabb
+	//SimulMan::Renderer renderer(
+	//	SimulMan::AABB{ { -0.5, -0.5, -0.5 } , { 0.5, 0.5, 0.5 } },
+	//	SimulMan::Point{ 0, 0, 0 },
+	//	SimulMan::Renderer::Tester::Closest);
+	//점 평면
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Plane{ { 1, 1, 1 } , 1.0 },
+	//	SimulMan::Point{ 0, 0, 0 },
+	//	SimulMan::Renderer::Tester::Closest);
+	//점 선분
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Segment{ { 0, 0, 0 } , { 1.0, 0.0, 0.0 } },
+	//	SimulMan::Point{ 0, 0, 0 },
+	//	SimulMan::Renderer::Tester::Closest);
+	//점 광선
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Ray{ { 0, 0, 0 } , { -1.0, 0.0, 0.0 } },
+	//	SimulMan::Point{ 0, 0, 0 },
+	//	SimulMan::Renderer::Tester::Closest);
+	//점 삼각형
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Triangle{ { 0, 0, 0 } , { 1, 1, 0 }, { 0, 0, 1 } },
+	//	SimulMan::Point{ 0, 0, 0 },
+	//	SimulMan::Renderer::Tester::Closest);
+	//점 사면체
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Tetrahedra{ { 0, 0, 0 } , { 1, 1, 0 }, { 0, 0, 1 }, { -0.5, 0.5, 0.5 } },
+	//	SimulMan::Point{ 0, 0, 0 },
+	//	SimulMan::Renderer::Tester::Closest);
+
+
+
+	//======== 레이케스트
+	//광선 삼각형
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Triangle{ { 0, 0, 0 } , { 1, 1, 0 }, { 0, 0, 1 } },
+	//	SimulMan::Ray{ { 0, 0, 0 } , { -1.0, 0.0, 0.0 } },
+	//	SimulMan::Renderer::Tester::Raycast);
+	//광선 평면
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Plane{ { 1, 1, 1 } , 1.0 },
+	//	SimulMan::Ray{ { 0, 0, 0 } , { -1.0, 0.0, 0.0 } },
+	//	SimulMan::Renderer::Tester::Raycast);
+	//광선 aabb
+	//SimulMan::Renderer renderer(
+	//	SimulMan::AABB{ { -0.5, -0.5, -0.5 } , { 0.5, 0.5, 0.5 } },
+	//	SimulMan::Ray{ { 0, 0, 0 } , { -1.0, 0.0, 0.0 } },
+	//	SimulMan::Renderer::Tester::Raycast);
+	//광선 구
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Sphere{ { -0.3, -0.3, -0.3 } , 0.6 },
+	//	SimulMan::Ray{ { 0, 0, 0 } , { -1.0, 0.0, 0.0 } },
+	//	SimulMan::Renderer::Tester::Raycast);
+	//광선 광선xx
+
+	//======== 2 평면 교차	
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Plane{ { 1, 1, 1 } , 1.0 },
+	//	SimulMan::Plane{ { -1, 1, 1 } , 1.0 },
+	//	SimulMan::Renderer::Tester::TwoPlanes);
+
+
+	//======== 3 평면 교차%%%%%%%%%%
+	SimulMan::Renderer renderer(
+		SimulMan::Plane{ { 1, 1, 1 } , 1.0 },
+		SimulMan::Plane{ { -1, 1, 1 } , 1.0 },
+		SimulMan::Plane{ { 1, -1, 1 } , 1.0 },
+		SimulMan::Renderer::Tester::ThreePlanes);
+
+
+	//======== 오버랩
 	//구 구
 	//SimulMan::Renderer renderer(
 	//	SimulMan::Sphere{ { -0.8, -0.8, -0.8 } , 0.6 },
@@ -94,10 +182,10 @@ int main() {
 	//	SimulMan::Triangle{ { 0, 0, 0 } , { 1, 1, 0 }, { 0, 0, 1 } },
 	//	SimulMan::Renderer::Tester::Overlap);
 	//평면 삼각형
-	SimulMan::Renderer renderer(
-		SimulMan::Plane{ { 1, 1, 1 } , 1.0 },
-		SimulMan::Triangle{ { 0, 0, 0 } , { 1, 1, 0 }, { 0, 0, 1 } },
-		SimulMan::Renderer::Tester::Overlap);
+	//SimulMan::Renderer renderer(
+	//	SimulMan::Plane{ { 1, 1, 1 } , 1.0 },
+	//	SimulMan::Triangle{ { 0, 0, 0 } , { 1, 1, 0 }, { 0, 0, 1 } },
+	//	SimulMan::Renderer::Tester::Overlap);
 	//삼각형 삼각형
 	//SimulMan::Renderer renderer(
 	//	SimulMan::Triangle{ { 0, 0, 0 } , { 0, 1, 1 }, { 0, 0, 1 } },
@@ -130,11 +218,6 @@ int main() {
 	//	SimulMan::Renderer::Tester::Overlap);
 	
 
-
-
-
-
-
 	////GJK
 	//SimulMan::ConvexPolyhedra poly0 = { { 0, 0, 0 } , { 0, 1, 1 }, { 0, 0, 1 } };
 	//SimulMan::ConvexPolyhedra poly1 = { { 0, 0, 0 } , { 1, 1, 0 }, { 0, 0, 1 } };
@@ -143,6 +226,10 @@ int main() {
 	//	poly0,
 	//	poly1,
 	//	SimulMan::Renderer::Tester::Overlap);
+
+
+
+
 
 	renderer.run();
 

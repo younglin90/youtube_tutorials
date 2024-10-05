@@ -91,11 +91,10 @@ namespace SimulMan {
     ) {
         Plane plane;
         plane.n = (tri.b - tri.a).cross(tri.c - tri.a).normalized();
+        plane.d = plane.n.dot(tri.a);
         vec3 cloPt = closest(p, plane);
-        if (
-            is_inside(cloPt, tri)) {
-            return cloPt;
-        }
+        double magSq0 = (p - cloPt).squaredNorm();
+        if (is_inside(cloPt, tri)) return cloPt;
 
         vec3 c1 = closest(p, Segment(tri.a, tri.b ));
         vec3 c2 = closest(p, Segment(tri.b, tri.c ));
@@ -113,6 +112,12 @@ namespace SimulMan {
         }
         return c3;
     }
+    vec3 closest(
+        const Triangle& tri,
+        const vec3& p
+    ) {
+        return closest(p, tri);
+    }
 
     //✓ 점 -> 사면체           RTCD 143
     // 간단한 방법은 사면체의 각 면 평면에 대해 closest point triangle
@@ -125,33 +130,111 @@ namespace SimulMan {
     ) {
         vec3 cloPt = p;
         double bestSqDist = std::numeric_limits<double>::max();
-        // ABC
-        if ((tet.b - tet.a).cross(tet.c - tet.a).dot(p - tet.a) < 0.0) {
-            vec3 q = closest(p, { tet.a, tet.b, tet.c });
+
+        // 각 삼각형에 대한 처리 함수
+        auto check_triangle = [&cloPt, &p, &bestSqDist](const Triangle& tri) {
+            vec3 q = closest(p, tri);
             double sqDist = (q - p).squaredNorm();
-            if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
-        }
-        // ACD
-        if ((tet.c - tet.a).cross(tet.d - tet.a).dot(p - tet.a) < 0.0) {
-            vec3 q = closest(p, { tet.a, tet.c, tet.d });
-            double sqDist = (q - p).squaredNorm();
-            if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
-        }
-        // ADB
-        if ((tet.d - tet.a).cross(tet.b - tet.a).dot(p - tet.a) < 0.0) {
-            vec3 q = closest(p, { tet.a, tet.d, tet.b });
-            double sqDist = (q - p).squaredNorm();
-            if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
-        }
-        // BDC
-        if ((tet.d - tet.b).cross(tet.c - tet.b).dot(p - tet.b) < 0.0) {
-            vec3 q = closest(p, { tet.b, tet.d, tet.c });
-            double sqDist = (q - p).squaredNorm();
-            if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+            if (sqDist < bestSqDist) {
+                bestSqDist = sqDist;
+                cloPt = q;
+            }
+        };
+
+        const auto faces = std::array<Triangle, 4>{
+            Triangle{tet.a, tet.b, tet.c},
+            Triangle{tet.a, tet.c, tet.d},
+            Triangle{tet.a, tet.d, tet.b},
+            Triangle{tet.b, tet.d, tet.c}
+        };
+
+        // 면에 대한 법선 방향 결정
+        const auto normals = std::array<vec3, 4>{
+            (tet.b - tet.a).cross(tet.c - tet.a),
+            (tet.c - tet.a).cross(tet.d - tet.a),
+            (tet.d - tet.a).cross(tet.b - tet.a),
+            (tet.d - tet.b).cross(tet.c - tet.b)
+        };
+
+        // 사면체 내부와 외부 방향 설정
+        bool reverse = normals[0].dot(tet.d - tet.a) < 0.0;
+
+        // 각 삼각형에 대해 점 p가 삼각형의 앞면에 있는지 확인하고 closest 함수 호출
+        for (int i = 0; i < 4; ++i) {
+            double dotProduct = normals[i].dot(p - faces[i].a);
+            if ((reverse && dotProduct > 0.0) || (!reverse && dotProduct < 0.0)) {
+                check_triangle(faces[i]);
+            }
         }
 
         return cloPt;
 
+
+        //// 방향 설정
+        //if ((tet.b - tet.a).cross(tet.c - tet.a).dot(tet.d - tet.a) < 0.0) {
+
+        //    // ABC
+        //    if ((tet.b - tet.a).cross(tet.c - tet.a).dot(p - tet.a) > 0.0) {
+        //        vec3 q = closest(p, Triangle{ tet.a, tet.b, tet.c });
+        //        double sqDist = (q - p).squaredNorm();
+        //        if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+        //    }
+        //    // ACD
+        //    if ((tet.c - tet.a).cross(tet.d - tet.a).dot(p - tet.a) > 0.0) {
+        //        vec3 q = closest(p, Triangle{ tet.a, tet.c, tet.d });
+        //        double sqDist = (q - p).squaredNorm();
+        //        if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+        //    }
+        //    // ADB
+        //    if ((tet.d - tet.a).cross(tet.b - tet.a).dot(p - tet.a) > 0.0) {
+        //        vec3 q = closest(p, Triangle{ tet.a, tet.d, tet.b });
+        //        double sqDist = (q - p).squaredNorm();
+        //        if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+        //    }
+        //    // BDC
+        //    if ((tet.d - tet.b).cross(tet.c - tet.b).dot(p - tet.b) > 0.0) {
+        //        vec3 q = closest(p, Triangle{ tet.b, tet.d, tet.c });
+        //        double sqDist = (q - p).squaredNorm();
+        //        if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+        //    }
+        //}
+        //else {
+
+        //    // ABC
+        //    if ((tet.b - tet.a).cross(tet.c - tet.a).dot(p - tet.a) < 0.0) {
+        //        vec3 q = closest(p, Triangle{ tet.a, tet.b, tet.c });
+        //        double sqDist = (q - p).squaredNorm();
+        //        if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+        //    }
+        //    // ACD
+        //    if ((tet.c - tet.a).cross(tet.d - tet.a).dot(p - tet.a) < 0.0) {
+        //        vec3 q = closest(p, Triangle{ tet.a, tet.c, tet.d });
+        //        double sqDist = (q - p).squaredNorm();
+        //        if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+        //    }
+        //    // ADB
+        //    if ((tet.d - tet.a).cross(tet.b - tet.a).dot(p - tet.a) < 0.0) {
+        //        vec3 q = closest(p, Triangle{ tet.a, tet.d, tet.b });
+        //        double sqDist = (q - p).squaredNorm();
+        //        if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+        //    }
+        //    // BDC
+        //    if ((tet.d - tet.b).cross(tet.c - tet.b).dot(p - tet.b) < 0.0) {
+        //        vec3 q = closest(p, Triangle{ tet.b, tet.d, tet.c });
+        //        double sqDist = (q - p).squaredNorm();
+        //        if (sqDist < bestSqDist) bestSqDist = sqDist, cloPt = q;
+        //    }
+        //}
+
+
+        //return cloPt;
+
+    }
+    vec3 closest(
+        const Tetrahedra& tet,
+        const vec3& p
+    ) {
+        return closest(p, tet);
     }
 
 
